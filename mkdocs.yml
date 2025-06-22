@@ -20,7 +20,6 @@ theme:
         name: 切换到浅色模式
 
 nav:
-  - 首页: index.md
+  - 首页: guide/index.md
   - 指南:
-      - 概览: guide/index.md
       - 操作用法: guide/usage.md
