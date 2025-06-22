@@ -1,9 +1,15 @@
 name: Deploy MkDocs site
 
+
+permissions:
+  contents: write    # 允许写代码到仓库
+  pages: write       # 允许推送到 Pages 分支
+
 on:
   push:
     branches:
       - main
+
 
 jobs:
   build-and-deploy:
