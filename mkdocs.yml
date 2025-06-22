@@ -21,4 +21,6 @@ theme:
 
 nav:
   - 首页: index.md
-  - 指南: guide.md
+  - 指南:
+      - 概览: guide/index.md
+      - 操作用法: guide/usage.md
