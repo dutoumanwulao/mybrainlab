@@ -22,11 +22,11 @@ git push origin main
 更多关于 Markdown 代码块语法高亮的用法，参阅 [Syntax Highlighting in Markdown Code Blocks](https://elischei.com/syntax-highlighting-in-markdown-code-blocks/)。
 
 ## 可以暂时修改编辑代码的平台
-<div style="border:1px solid #333; border-radius:8px; padding:20px; margin:16px 0; background:#181A1B;">
+<div style="border:1px solid #333; border-radius:8px; padding:13px; margin:16px 0; background:#181A1B;">
   <b style="color:#aad8ef;">可编辑代码：</b><br>
   <pre contenteditable="true"
        style="width:100%; min-height:80px; font-family:monospace;
-              font-size:13px; background:#181A1B; color:#f7f7f7;
+              font-size:15px; background:#181A1B; color:#f7f7f7;
               border-radius:6px; padding:8px; border:none; outline:none;">
 # 这里也可以编辑内容
 print("Hello, world!")
