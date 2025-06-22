@@ -8,7 +8,7 @@ git push
 
 mkdocs gh-deploy
 
-# 一键更新并触发部署
+## 一键更新并触发部署
 git add docs/ mkdocs.yml && \
 git commit -m "更新：完善指南和操作用法文档" && \
 git push
