@@ -21,8 +21,6 @@ theme:
         icon: material/weather-sunny
         name: 切换到浅色模式
 
-site_name: mybrainlab
-site_url: https://dutoumanwulao.github.io/mybrainlab/
 
 theme:
   name: material
@@ -45,12 +43,13 @@ theme:
         name: 切换到浅色模式
 
 markdown_extensions:
-  - codehilite:            # Python-Markdown 的代码高亮
+  - codehilite:
       guess_lang: false
-  - pymdownx.superfences   # 支持更多代码块语法（可选）
-  - pymdownx.inlinehilite  # 行内高亮（可选）
-  - pymdownx.toc:          # 为标题添加“¶”锚点
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.toc:
       permalink: true
+
 
 nav:
   - 首页: index.md
