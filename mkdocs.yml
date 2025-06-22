@@ -21,9 +21,43 @@ theme:
         icon: material/weather-sunny
         name: 切换到浅色模式
 
+site_name: mybrainlab
+site_url: https://dutoumanwulao.github.io/mybrainlab/
+
+theme:
+  name: material
+  language: zh
+  features:
+    - content.code.copy     # 启用代码复制按钮
+    - navigation.instant    # 启用即时异步导航（点击不整页刷新）
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: 切换到暗黑模式
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: 切换到浅色模式
+
 markdown_extensions:
-  - pymdownx.highlight     # 语法高亮
-  - pymdownx.inlinehilite
+  - codehilite:            # Python-Markdown 的代码高亮
+      guess_lang: false
+  - pymdownx.superfences   # 支持更多代码块语法（可选）
+  - pymdownx.inlinehilite  # 行内高亮（可选）
+  - pymdownx.toc:          # 为标题添加“¶”锚点
+      permalink: true
+
+nav:
+  - 首页: index.md
+  - 指南:
+      - 概览: guide/index.md
+      - 操作用法: guide/usage.md
+
 
 
 nav:
