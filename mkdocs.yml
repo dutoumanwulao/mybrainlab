@@ -26,8 +26,9 @@ markdown_extensions:
       guess_lang: false
   - pymdownx.superfences
   - pymdownx.inlinehilite
-  - pymdownx.toc:
+  - toc:
       permalink: true
+
 
 
 nav:
