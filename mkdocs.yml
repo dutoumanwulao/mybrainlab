@@ -36,6 +36,19 @@ nav:
   - 指南:
       - 概览: guide/index.md
       - 操作用法: guide/usage.md
+  - 核医学:
+      - 介绍: nukmed/index.md
+      - 核医学图像重建:
+          - 总览: nukmed/recon/index.md
+          - 重建算法:
+              - 总览: nukmed/recon/alg/index.md
+              - FBP: nukmed/recon/alg/fbp.md
+              - OSEM: nukmed/recon/alg/osem.md
+              - MLEM: nukmed/recon/alg/mlem.md
+          - SIRF:
+              - 介绍: nukmed/recon/sirf/index.md
+              - xxxx: nukmed/recon/sirf/xxxx.md   # 后续可添加更多
+
 
 
 
