@@ -5,8 +5,8 @@
 详细信息和教程请参考：
 
 
-- [SIRF 官网](https://www.ccpsynerbi.ac.uk/)
+→ [SIRF 官网](https://www.ccpsynerbi.ac.uk/)
 
-- [SIRF 项目 Wiki](https://github.com/SyneRBI/SIRF/wiki)
+→ [SIRF 项目 Wiki](https://github.com/SyneRBI/SIRF/wiki)
 
-- [SIRF 练习材料](https://github.com/SyneRBI/SIRF-Exercises/tree/master)
+→ [SIRF 练习材料](https://github.com/SyneRBI/SIRF-Exercises/tree/master)
