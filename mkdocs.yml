@@ -21,6 +21,13 @@ theme:
         icon: material/weather-sunny
         name: 切换到浅色模式
 
+plugins:
+  - search:
+      lang: [zh, en]
+      separator: '[\s\-\.，。,，。!！?？:：；;、/\\|~`@#\$%\^&\*\(\)_\+=\[\]\{\}<>\'\"“”‘’‹›«»\u3000·…—_]+'
+
+
+
 markdown_extensions:
   - codehilite:
       guess_lang: false
