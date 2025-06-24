@@ -12,3 +12,6 @@ import sirf.STIR as pet
 ```python
 image = pet.ImageData('your_pet_data_file.hv')
 ```
+
+
+### ImageData 类相关的操作
