@@ -56,7 +56,9 @@ nav:
               - MLEM: nukmed/recon/alg/mlem.md
           - SIRF:
               - 介绍: nukmed/recon/sirf/index.md
-              - xxxx: nukmed/recon/sirf/xxxx.md   # 后续可添加更多
+              - 涉及各种数据类型介绍: nukmed/recon/sirf/pictype.md
+              - xxxx: nukmed/recon/sirf/xxxx.md   
+              
 
 
 
