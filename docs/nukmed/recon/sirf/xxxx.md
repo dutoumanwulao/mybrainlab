@@ -49,6 +49,17 @@ print("模板投影数据格式：")
 print("尺寸 shape:", template.shape())
 print("每个维度数量:", template.dimensions())
 print("类型 type:", type(template))
+```
+
+则输出为
+
+```text
+模板投影数据格式：
+尺寸 shape: (31, 252, 128)
+每个维度数量: (31, 252, 128)
+类型 type: <class 'sirf.STIR.AcquisitionData'>
+```
+
 
 
 ## ImageData 类相关的操作
