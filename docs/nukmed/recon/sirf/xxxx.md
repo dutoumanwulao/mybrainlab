@@ -61,7 +61,7 @@ print("类型 type:", type(template))
 每个维度数量: (31, 252, 128)
 类型 type: <class 'sirf.STIR.AcquisitionData'>
 ```
-当然，正如数据类型章节所说的，[医学图像数据的区别](nukmed/recon/sirf/pictype.md## .hv 文件和 .hs 文件 和 .v 文件 和 .s 文件)，也可以对于头部文件直接进行数据处理，内部算法会直接处理相应的完整数据。
+当然，正如数据类型章节所说的，[点击查看医学图像数据的区别](nukmed/recon/sirf/pictype.md#hvhsdata)，也可以对于头部文件直接进行数据处理，内部算法会直接处理相应的完整数据。
 
 
 
