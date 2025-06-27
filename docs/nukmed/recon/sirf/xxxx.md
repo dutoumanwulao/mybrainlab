@@ -8,7 +8,7 @@ import sirf.STIR as pet
 ```
 
 
-## 阅读PET图像
+## 阅读PET图像`pet.ImageData`
 
 从磁盘上阅读一份医学影像文件，变成SIRF可以操控的对象
 ```python
@@ -63,6 +63,29 @@ print("类型 type:", type(template))
 ```
 当然，正如数据类型章节所说的，[点击查看医学图像数据的区别](pictype.md#hv-文件和-hs-文件-和-v-文件-和-s-文件-hvhsdata)，也可以对于头部文件直接进行数据处理，内部算法会直接处理相应的完整数据。
 
+
+#### `.set_up`操作
+
+使用`.set_up`配置文件，才能进行下一步操作，如下代码，抽取了体图像和sinogram的头文件配置进行下一步操作
+
+```python
+acq_model.set_up(template, image) #注意这里只有配置没有赋值给任何代码
+```
+
+
+#### 前投和背投 `.forward`和`.backward`
+
+接下来就可以对数据进行前投，用图像产生sinogram：
+
+```python
+acquired_data = acq_model.forward(image)
+```
+
+也可以产生背投，指的是sinogram变成图像：
+
+```python
+acquired_data = acq_model.backward(image)
+```
 
 
 ## ImageData 类相关的操作

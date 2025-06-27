@@ -57,7 +57,8 @@ nav:
           - SIRF:
               - 介绍: nukmed/recon/sirf/index.md
               - 涉及各种数据类型介绍: nukmed/recon/sirf/pictype.md
-              - xxxx: nukmed/recon/sirf/xxxx.md   
+              - xxxx: nukmed/recon/sirf/xxxx.md  
+          - PET介绍:  nukmed/recon/sirf/PETintro.md
   - 科研想法计划记录:
       - 介绍: researchidea/index.md
       - 科研想法记录:
