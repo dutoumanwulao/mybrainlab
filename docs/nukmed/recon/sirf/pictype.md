@@ -14,7 +14,7 @@ image = pet.ImageData('emission.hv')
 ```
 
 
-## .hv 文件和 .hs 文件 和 .v 文件 和 .s 文件(#hvhsdata)
+## .hv 文件和 .hs 文件 和 .v 文件 和 .s 文件 {#hvhsdata}
 
 这些文件都是来源于SIRF中的SITR的内容
 
