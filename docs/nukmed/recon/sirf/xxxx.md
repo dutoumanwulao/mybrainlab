@@ -88,6 +88,25 @@ acquired_data = acq_model.backward(image)
 ```
 
 
+
+## OSMAPOSL算法相关
+
+#### 创造计算两幅Sinogram相似度的泊松对数相似函数
+
+```python
+obj_fun = pet.make_Poisson_loglikelihood(acquired_data)
+```
+借此创造一个函数赋值为obj_fun可以利用泊松对数相似函数计算两幅sinogram之间的区别，这个是在PET中的特殊用法，在其他图像中一般我们直接乘除就可以。这个函数算出来的结果一般是负值，数值越接近0，说明两个sinogram越相似。
+
+#### 配置投影方式
+```python
+obj_fun.set_acquisition_model(acq_model)
+#这里的acq_model是指前面的acq_model = pet.AcquisitionModelUsingRayTracingMatrix()，
+#如果sinogram的采集方式都不一样，那不是贻笑大方了
+```
+
+
+
 ## ImageData 类相关的操作
 
 **说明：**  
