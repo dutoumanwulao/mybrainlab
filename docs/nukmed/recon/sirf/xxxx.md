@@ -105,6 +105,68 @@ obj_fun.set_acquisition_model(acq_model)
 #如果sinogram的采集方式都不一样，那不是贻笑大方了
 ```
 
+#### 使用OSMAPOSLReconstructor()构建重构器
+
+配置重构器，使用OSMAP-OSL 算法，即Ordered Subsets MAP One-Step-Late，是OSEM的升级版本
+
+```python
+recon = pet.OSMAPOSLReconstructor()
+```
+
+设置分割子集
+
+```python
+recon.set_num_subsets(4)
+```
+
+设置子迭代次数
+
+```python
+num_subiters = 60
+recon.set_num_subiterations(num_subiters)
+```
+
+
+##### 设置初始化图
+
+设置一个图像大小和image相同，数值均匀的自定义图像：
+
+```python
+initial_image = image.get_uniform_copy(cmax / 4) #得到一个图像
+
+recon.set_current_estimate(initial_image) #设置这个图像为初始图像
+
+```
+
+准备重建器
+
+```python
+recon.set_up(initial_image)
+```
+
+开始执行
+
+```python
+recon.process()
+```
+
+取出重建结果
+
+```python
+reconstructed_image = recon.get_output()
+```
+
+写出结果到文件
+
+```python
+reconstructed_image.write('OSEM_result.hv')
+```
+
+也可以输出另外格式
+
+```python
+reconstructed_image.write('out.mhd', write_par='stir_to_mhd.par')
+```
 
 
 ## ImageData 类相关的操作
