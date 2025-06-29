@@ -25,6 +25,11 @@ image = pet.ImageData('your_pet_data_file.hv')
 ```python
 acq_model = pet.AcquisitionModelUsingRayTracingMatrix()
 ```
+如果是使用衰减图，同样地，初始化一个射线追踪模型：
+
+```python
+acq_model_for_attn = pet.AcquisitionModelUsingRayTracingMatrix()
+```
 
 
 ### `pet.AcquisitionData`用法
@@ -64,6 +69,13 @@ print("类型 type:", type(template))
 当然，正如数据类型章节所说的，[点击查看医学图像数据的区别](pictype.md#hv-文件和-hs-文件-和-v-文件-和-s-文件-hvhsdata)，也可以对于头部文件直接进行数据处理，内部算法会直接处理相应的完整数据。
 
 
+
+如果是处理带衰减图的数据，同样地在这里配置：
+
+```python
+attn_image = pet.ImageData(os.path.join(data_path, 'attenuation.hv'))
+asm_attn = pet.AcquisitionSensitivityModel(attn_image, acq_model_for_attn)
+```
 #### `.set_up`操作
 
 使用`.set_up`配置文件，才能进行下一步操作，如下代码，抽取了体图像和sinogram的头文件配置进行下一步操作
@@ -71,8 +83,11 @@ print("类型 type:", type(template))
 ```python
 acq_model.set_up(template, image) #注意这里只有配置没有赋值给任何代码
 ```
+同样配置衰减图：
 
-
+```python
+asm_attn.set_up(template)
+```
 #### 前投和背投 `.forward`和`.backward`
 
 接下来就可以对数据进行前投，用图像产生sinogram：
@@ -87,7 +102,48 @@ acquired_data = acq_model.forward(image)
 acquired_data = acq_model.backward(image)
 ```
 
+## 配置相关衰减图和噪声
 
+在sinogram里面计算衰减图对于每个bin的衰减，之后每次只需要乘上这个sinogram就行，就可以得到每个bin的衰减
+
+计算敏感度因子，使用sinogram前投sinogram
+```python
+attn_factors = asm_attn.forward(template.get_uniform_copy(1))
+```
+
+然后创建新的敏感图模型，这样每次投影都会乘上衰减因子
+
+```python
+asm_attn = pet.AcquisitionSensitivityModel(attn_factors)
+```
+然后在主模型里面引用它，
+
+```python
+acq_model = pet.AcquisitionModelUsingRayTracingMatrix()
+# 可选：提高每条 LOR 的射线数目以模拟更精细的射线追踪
+acq_model.set_num_tangential_LORs(5)
+# 把刚才的衰减敏感度模型绑定进采集模型
+acq_model.set_acquisition_sensitivity(asm_attn)
+# 准备几何信息
+acq_model.set_up(template, image)
+```
+
+ —— 后续投影时就会自动 proj * attn_factors ——  
+
+ ```python
+acquired_data = acq_model.forward(image)
+```
+
+### 加入背景噪声
+
+ ```python
+# 1. 生成一个全图像都相同值的背景 sinogram
+background_term = acquired_data.get_uniform_copy(acquired_data.max() / 10)
+
+acq_model.set_background_term(background_term)
+# 2. 重新模拟
+acquired_data = acq_model.forward(image)
+```
 
 ## OSMAPOSL算法相关
 
@@ -191,4 +247,14 @@ image.dimensions()    # 可能输出 (64, 128, 128)
 ```python
 arr = image.as_array()
 ```
+
+
+
+## 创建包含背景噪声和衰减图校正的模型
+
+#### 规定投影模型，同样使用射线追踪法
+
+
+acq_model_for_attn = pet.AcquisitionModelUsingRayTracingMatrix()
+
 
