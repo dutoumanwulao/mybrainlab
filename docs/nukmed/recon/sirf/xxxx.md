@@ -70,7 +70,7 @@ print("类型 type:", type(template))
 
 
 
-如果是处理带衰减图的数据，同样地在这里配置：
+如果是处理带衰减图的数据，同样地在这里配置：注意，这个AcquisitionSensitivityModel会根据输入结果的不同产生不同的东西，如果输入体素图他就会产生一个衰减图sinogram数据，不过如果输入一个sinogram，它就会配置一个之后每次前投和背投都会把这个sinogram当做衰减图的操作。
 
 ```python
 attn_image = pet.ImageData(os.path.join(data_path, 'attenuation.hv'))
@@ -83,7 +83,7 @@ asm_attn = pet.AcquisitionSensitivityModel(attn_image, acq_model_for_attn)
 ```python
 acq_model.set_up(template, image) #注意这里只有配置没有赋值给任何代码
 ```
-同样配置衰减图：
+同样配置衰减图：使用衰减模型时不需要配置image
 
 ```python
 asm_attn.set_up(template)
@@ -106,12 +106,12 @@ acquired_data = acq_model.backward(image)
 
 在sinogram里面计算衰减图对于每个bin的衰减，之后每次只需要乘上这个sinogram就行，就可以得到每个bin的衰减
 
-计算敏感度因子，使用sinogram前投sinogram
+计算敏感度因子，使用sinogram前投sinogram，首先创造全1的格式相同的sinogram，然后对于这个在衰减模型里面做前投就会得到一个每条衰减因子的系数，也就是说在这个特殊的模型里，就是前面配置的AcquisitionSensitivityModel模型里面，如果对sinogram进行前投还是会得到sinogram，不过得到一个衰减比例的sinogram，比如一个像素点本来是1，衰减后到达探测器其实只有0.67了，那么这个前投以后就会把这个像素点的值变成0.67。
 ```python
 attn_factors = asm_attn.forward(template.get_uniform_copy(1))
 ```
 
-然后创建新的敏感图模型，这样每次投影都会乘上衰减因子
+然后创建新的敏感图模型，这样每次投影都会乘上衰减因子，每次前投后投，暂且当做固定用法。
 
 ```python
 asm_attn = pet.AcquisitionSensitivityModel(attn_factors)
@@ -167,6 +167,11 @@ obj_fun.set_acquisition_model(acq_model)
 
 ```python
 recon = pet.OSMAPOSLReconstructor()
+```
+
+为重建器配置目标
+```python
+recon.set_objective_function(obj_fun)
 ```
 
 设置分割子集
@@ -250,11 +255,10 @@ arr = image.as_array()
 
 
 
-## 创建包含背景噪声和衰减图校正的模型
+## 结果展示
 
-#### 规定投影模型，同样使用射线追踪法
+### 使用 OSMAP-OSL 算法迭代重建 30 次——理想图
 
-
-acq_model_for_attn = pet.AcquisitionModelUsingRayTracingMatrix()
+![使用OSMAP-OSL算法迭代重建30次每次图像显示——理想图](D:\scieboo\fh_master\first_paper_ever_in_life\master毕设及图像重建researchpro4\imaginrecon\OSEM\idea)
 
 
