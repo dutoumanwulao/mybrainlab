@@ -259,6 +259,6 @@ arr = image.as_array()
 
 ### 使用 OSMAP-OSL 算法迭代重建 30 次——理想图
 
-![使用OSMAP-OSL算法迭代重建30次每次图像显示——理想图](D:\scieboo\fh_master\first_paper_ever_in_life\master毕设及图像重建researchpro4\imaginrecon\OSEM\idea)
+![使用OSMAP-OSL算法迭代重建30次每次图像显示——理想图](/docs/pic/imagingrecon/OSEMa/OSEM1-30iterate.png)
 
 
