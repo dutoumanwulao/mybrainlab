@@ -66,6 +66,9 @@ nav:
       - 介绍: researchidea/index.md
       - 科研想法记录:
           - 医学图像处理相关: researchidea/picrecon.md
+  - 金融知识:
+      - 股票相关:
+          - 基础知识: Finance/stock/basic.md
               
 
 
