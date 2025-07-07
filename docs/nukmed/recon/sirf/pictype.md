@@ -30,3 +30,28 @@ image = pet.ImageData('emission.hv')
 
 
 - 而 `.v` 和 `.s` 展示相应的完整信息。不过，在实际代码的处理中，直接通过阅读处理`.hv` 和 `.hs`头文件系统内部会有默认算法处理同一路径下的`.v` 和 `.s`文件内容。
+
+
+## .hdr 文档
+
+**什么是 `.hdr` 文件？**  
+`.hdr`（header）文件是 Interfile 格式的数据“说明书”，它**不包含像素/投影数据本身**，只存放描述二进制数据的位置、尺寸、类型等元信息。
+
+简单来说他就是实际生产过程中机器会产生的文档形式，每个厂商最后产出的hdr文档细节会有略微不同，一般会需要略微转换一下
+
+---
+
+**示例 `example.hdr`**  
+```ini
+!INTERFILE      :=                #标识这是一个 Interfile 头文件。
+!name of data file := example.img #指向实际存放像素/投影数据的二进制文件名。
+!number of dimensions := 3        #数据的维度（这里是 3D）
+!matrix size [1]     := 128       # 一维 x
+!matrix size [2]     := 128       # 二维y
+!matrix size [3]     := 64        # 三维z
+!scaling factor (mm/pixel) [1] := 2.0  #第 1 维每像素对应的物理距离（单位 mm）
+!scaling factor (mm/pixel) [2] := 2.0
+!scaling factor (mm/pixel) [3] := 2.5
+!number format         := integer   #二进制文件中数据的数值类型（整型）
+!number of bytes per pixel := 2    #每个像素/体素占用的字节数（这里 2 字节）
+```
