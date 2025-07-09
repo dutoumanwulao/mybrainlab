@@ -6,7 +6,11 @@
 ```python
 import sirf.STIR as pet
 ```
-
+也可以
+```python
+from sirf.STIR import *
+```
+这样在之后每次使用内部函数时候都不需要再用pet.什么什么的函数。直接用就可以。
 
 ## 阅读PET图像`pet.ImageData`
 
@@ -68,8 +72,33 @@ print("类型 type:", type(template))
 ```
 当然，正如数据类型章节所说的，[点击查看医学图像数据的区别](pictype.md#hv-文件和-hs-文件-和-v-文件-和-s-文件-hvhsdata)，也可以对于头部文件直接进行数据处理，内部算法会直接处理相应的完整数据。
 
+##### 同样作为探测器几何，但是不是读取一个文件内容，而是自己构造一个探测器几何，用于修剪更改压缩内容
 
 
+```python
+template_acq_data = AcquisitionData('Siemens_mMR', span=11, max_ring_diff=15, view_mash_factor=2)
+```
+注意这里就是没有用pet.AcquisitionData, 因为之前规定的是from sirf.STIR import *，
+
+'Siemens_mMR'是机器系统名字，span表示压缩因子，等于11就是把11个环差的数据都压缩到一个平面上。max_ring_diff=15只统计小于15的环差的数据，本来有60这里就不统计。
+
+##### `.write`用法
+
+在SIRF里面 .write表示把前文档输出成后面括号带有的后缀形式，就是这么简单
+
+```python
+some_data_object.write(<filename>)
+```
+或者更加具体地说
+
+```python
+reconstructed_image.write('OSEM_result.hv')
+```
+就会产生两个文件，一个是'OSEM_result.hv'，一个是'OSEM_result.v'
+
+
+
+#### `AcquisitionSensitivityModel`用法
 如果是处理带衰减图的数据，同样地在这里配置：注意，这个AcquisitionSensitivityModel会根据输入结果的不同产生不同的东西，如果输入体素图他就会产生一个衰减图sinogram数据，不过如果输入一个sinogram，它就会配置一个之后每次前投和背投都会把这个sinogram当做衰减图的操作。
 
 ```python
@@ -262,3 +291,76 @@ arr = image.as_array()
 ![使用OSMAP-OSL算法迭代重建30次每次图像显示——理想图](pic/OSEM1-30iterate.png)
 
 
+
+
+##  使用真实数据来构建
+
+本系列基于ucl的mMR 获取的PET/MR数据来操作真实数据的图像重建
+
+
+### 数据准备
+
+首先使用在代码格里面模仿shell操作的代码来进行操作，这个cp 在unix/linux里面表示 复制一个文件到另外一个文件路径，主要形式功能就是从源文件夹位置复制到工作文件夹位置，使用方法是cp <源文件路径> <目标文件路径>
+，在这里 $data_path/20170809_NEMA_UCL.n.hdr是原始路径而norm.n.hdr表示名字，因为之前已经定位了路径所以会在工作路径下创造一个此名字文件
+```python
+!cp $data_path/20170809_NEMA_UCL.n.hdr norm.n.hdr
+```
+
+使用SIRF里面自带的函数来处理转化收集到的数据到SIRF可以处理的格式
+```python
+!convertSiemensInterfileToSTIR.sh $data_path/20170809_NEMA_MUMAP_UCL.v.hdr umap.v.hdr
+```
+
+修剪其中数据，更加符合格式，具体原理之后再论述
+```python
+# These files will sometimes have lines terminated with CR instead of CRLF, fix this
+# This just means, if we see CR<character> and <character> isn't LF, replace it with CRLF<character>
+!sed -i.bak "s/\r\([^\n]\)/\r\n\1/g" norm.n.hdr
+!sed -i.bak "s/\r\([^\n]\)/\r\n\1/g" umap.v.hdr
+```
+
+在header中插入数据的绝对路径
+
+
+```python
+# Now add absolute data path to the header file
+# This command prepends the data path to the data file so that the header in our working folder points to the data
+# You won't need to do this for your own data if the data file is in the same directory.
+!sed -i.bak2 -e "s#\(!name of data file:=\)#\\1{data_path}/#" umap.v.hdr
+!sed -i.bak2 -e "s#\(!name of data file:=\)#\\1{data_path}/#" norm.n.hdr
+```
+
+执行更改后的变化，不重要，仅浏览
+
+```python
+10c10,13
+< !name of data file:=20170809_NEMA_MUMAP_UCL.v
+---
+> !name of data file:=/home/jovyan/work/SIRF-Exercises/data/PET/mMR/NEMA_IQ/20170809_NEMA_MUMAP_UCL.v
+> 
+> !GENERAL IMAGE DATA :=
+> !type of data := PET
+12d14
+< !GENERAL IMAGE DATA:=
+15c17
+< image data byte order:=LITTLEENDIAN
+---
+> imagedata byte order:=LITTLEENDIAN
+27,29c29,31
+< scale factor (mm/pixel) [1]:=2.08626
+< scale factor (mm/pixel) [2]:=2.08626
+< scale factor (mm/pixel) [3]:=2.03125
+---
+> scaling factor (mm/pixel) [1]:=2.08626
+> scaling factor (mm/pixel) [2]:=2.08626
+> scaling factor (mm/pixel) [3]:=2.03125
+37,38c39,41
+< !image duration (sec):=0
+< !image relative start time (sec):=0
+---
+> number of time frames:=1
+> !image duration (sec)[1]:=0
+> !image relative start time (sec)[1]:=0
+77a81
+> !END OF INTERFILE :=
+```

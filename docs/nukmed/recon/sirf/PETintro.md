@@ -9,3 +9,11 @@
 径向 `radial_bin` 对应于 CT sinogram 里的 s：它表示沿该方向上，相对于中心线的偏移距离。
 
 也就是说，PET sinogram 的索引 `(angle_bin, radial_bin)` 就相当于 CT 中的 `(θ, s)`。两者在数学和几何描述上是完全对等的，只不过 PET 记录的是计数事件，CT 记录的是线积分值。
+
+
+## 延迟时间窗口
+
+在TOF-PET中，我们通常使用识别coincide event的方式构建list-mode最后进行图像重建，我们首先设置一个时间窗口，这个时间窗口可能再3ns内，在这个时间窗口内两个探测器识别到的同一事件我们就认为是一个放射源发出的，但是这样的识别中间还包含了很多假的事件，被探测到的总事件等于 true coincidences + scatter coincidences + random coincidences，现在我们把另一个探测器延迟50ns，时间窗口还是3ns，我们对其进行再判断，然后统计个数，在这个延迟链里面还是被判断为巧合事件的就是随机事件，减去这个事件数量就可以。
+​
+ 
+​
