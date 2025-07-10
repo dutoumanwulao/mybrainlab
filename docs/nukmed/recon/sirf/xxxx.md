@@ -364,3 +364,134 @@ arr = image.as_array()
 77a81
 > !END OF INTERFILE :=
 ```
+
+
+### ListmodeToSinograms()把listmode转化成sinogram
+
+指定文件路径，之后用到的时候都会去这个路径里面找文件
+
+```python
+list_file = os.path.join(data_path, '20170809_NEMA_60min_UCL.l.hdr')
+# 结果就是 '/home/you/my_data/PET/mMR/NEMA_IQ/20170809_NEMA_60min_UCL.l.hdr'
+```
+
+现在把下面这两个字符串赋值到下面这两个变量里面方便以后使用
+
+```python
+norm_file = 'norm.n.hdr'
+attn_file = 'umap.v.hdr'
+sino_file = 'sino'
+```
+这有什么用，没什么用，就是使用方便一点罢了，有什么用？比如之后如果按下面输入
+
+```python
+output_name = sino_file + '.hs'   # 就会得到 'sino.hs'
+```
+就是这么个结果，没什么特殊的
+
+然后把python运行过程中的运行步骤和警告都储存为日志
+
+```python
+_ = MessageRedirector('info.txt', 'warnings.txt')
+```
+
+#### 创建转化器 
+
+首先构造了一个listmode到sinogram的转化器，这是都需要的。
+
+```python
+lm2sino = ListmodeToSinograms()
+```
+##### 输入文件
+
+在这里输入之前规定好路径的文件
+
+```python
+lm2sino.set_input(list_file)
+```
+
+然后使用下面函数使得所有输出的文件都带有前缀sino，因为这是前面定义的
+
+```python
+lm2sino.set_output_prefix(sino_file)
+```
+
+##### 使用这个文档作为模版
+
+
+在这里使用这个文档作为模版
+
+```python
+lm2sino.set_template('template.hs')
+```
+
+##### 设置输入时间
+
+在这里告诉机器只取用前面600秒作为数据来源制作sinogram
+
+```python
+lm2sino.set_time_interval(0, 600)  # 0 到 600 秒
+```
+
+
+接下来使用setup，这是刻板的一步，就好像VDHL里面一样，非常刻板，每次跑完以后都要setup一下就是这个意思
+
+
+
+然后产生文档
+
+```python
+lm2sino.process()
+```
+
+##### 取出数据
+
+
+现在取出数据然后变成array形式，因为第一列式tof信息，这里没有，所以我们不要
+
+```python
+# get access to the sinograms
+acq_data = lm2sino.get_output()
+
+# copy the acquisition data into a Python array
+acq_array = acq_data.as_array()[0,:,:,:]  # first index is for ToF, which we don't have here
+```
+
+##### 统计一共多少光子，输出sinogram的大小
+
+```python
+# how many counts total?
+print('num prompts: %d' % acq_array.sum())
+
+# print the data sizes. 
+print('acquisition data dimensions: %dx%dx%d' % acq_array.shape)
+```
+
+
+取出其中一个打印出来看是什么样子
+
+
+```python
+# use a slice number for display that is appropriate for the NEMA phantom
+# showing a "middle" sinogram in segment 0.
+z = 71
+show_2D_array('Acquisition data', acq_array[z,:,:])
+```
+得到输出数据
+
+acquisition data dimensions: 357x126x344
+表示
+357 —— 表示 segment（分段/层，通常和探测器环的组合有关），一共 357 个 segment 层
+
+126 —— 表示探测器角度
+
+344 —— 在角度基础上的层层分割
+
+##### `.create_uniform_image`创造统一图像
+
+使用下面代码，创造一个固定大小的1数值的acq_data格式的图像
+
+```python
+nxny = (127, 127)
+initial_image = acq_data.create_uniform_image(1.0, nxny)
+```
