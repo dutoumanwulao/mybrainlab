@@ -101,13 +101,54 @@ reconstructed_image.write('OSEM_result.hv')
 #### `AcquisitionSensitivityModel`用法
 如果是处理带衰减图的数据，同样地在这里配置：注意，这个AcquisitionSensitivityModel会根据输入结果的不同产生不同的东西，如果输入体素图他就会产生一个衰减图sinogram数据，不过如果输入一个sinogram，它就会配置一个之后每次前投和背投都会把这个sinogram当做衰减图的操作。
 
+本质上这是一个对于siongram上的每个像素点乘一个因子的操作，如果是输入图片加采集方式，那么救护自动转化为sinogram，如果直接输入sinogram，那么就会直接运用这个sinogram，这个操作也就是说每次前投背投都会运用这个操作。
+
+之前对于这个每次都会乘以这个衰减图因子有困惑，为什么前投后投都要，很简单，这是一个构造在sinogram上面的系数，乘以这个衰减图才是考虑了衰减的真实数据，在迭代中要对比sinogram和图像，所以前投后投都会考虑
+
+这里输入的是sinogram，前投是把图像变成sinogram，所以这个过程中是先做前投在乘以sinogram
+
 ```python
 attn_image = pet.ImageData(os.path.join(data_path, 'attenuation.hv'))
 asm_attn = pet.AcquisitionSensitivityModel(attn_image, acq_model_for_attn)
 ```
+##### 灵敏度矫正
+
+对于PET来说不同闪烁晶体的探测效率不同，不同的探测器之间也会存在空隙，所以需要
+同样地，如果是输入灵敏度矫正图，也可以可以用AcquisitionSensitivityModel，
+
+```python
+# create it from the supplied file
+asm_norm = AcquisitionSensitivityModel(norm_file)
+```
+
+然后进行setup，给一个几何结构的sinogram标准，接下来会按照这个标准来setup
+
+```python
+# 初始化灵敏度模型，告诉它要处理哪个 sinogram（投影数据）
+asm_norm.set_up(acq_data)
+```
+
+下面展示这个校正因子的效率图，就是先构建一个全1的大小一样的图像然后再乘以原来的校正因子图
+
+```python
+det_efficiencies=acq_data.get_uniform_copy(1)
+asm_norm.unnormalise(det_efficiencies)
+```
+
+
+当然还有一种很逻辑的用法就是一次性把他们两个sinogram都乘起来，就是探测器灵敏度和衰减因子乘起来
+```python
+# chain attenuation and normalisation
+asm = AcquisitionSensitivityModel(asm_norm, asm_attn)
+```
+
+
+
+
 #### `.set_up`操作
 
 使用`.set_up`配置文件，才能进行下一步操作，如下代码，抽取了体图像和sinogram的头文件配置进行下一步操作
+这个setup在前面输入的是一个sinogram，在后面输入一个图像
 
 ```python
 acq_model.set_up(template, image) #注意这里只有配置没有赋值给任何代码
@@ -495,3 +536,68 @@ acquisition data dimensions: 357x126x344
 nxny = (127, 127)
 initial_image = acq_data.create_uniform_image(1.0, nxny)
 ```
+
+### 配置散射噪声
+
+在SIRF里面同样有散射噪声配置器，需要输入真实sinogram，衰减图等
+
+
+
+```python
+se = ScatterEstimator() #建设一个散射噪声配置器
+se.set_input(acq_data)  #输入原始sinogram
+se.set_attenuation_image(attn_image)  #输入衰减图
+se.set_randoms(randoms)               #输入随机噪声
+se.set_asm(asm_norm)                  #输入灵敏度分布
+
+
+acf_factors = attn_factors.get_uniform_copy()
+acf_factors.fill(1/attn_factors.as_array())
+se.set_attenuation_correction_factors(acf_factors)  #输入衰减校准因子
+
+se.set_num_iterations(3)    #输入迭代次数
+se.set_up()                 # 准备
+se.process()                #执行
+scatter_estimate = se.get_output()  #输出结果，这边这个结果是一个sinogram
+```
+
+然后再把之前所有的数据都输入进去再进行一次重建
+```python
+acq_model.set_background_term(randoms + scatter_estimate) # 输入合并背景项目
+
+acq_model.set_up(acq_data, initial_image)      #准备模型
+
+
+obj_fun.set_acquisition_model(acq_model)          #配置成像方式，输入照相机型号
+recon.set_objective_function(obj_fun)             #把这个型号告诉重建算法
+
+recon.set_up(initial_image)                       #告诉重建器图像的大小尺寸信息
+recon.set_current_estimate(initial_image)         #输入估计图像，也就是初始图像，不断迭代的
+# initial_image = acq_data.create_uniform_image(1.0, (127,127))    #这个图像的来源是之前的这个代码，这里只做示例，不是真的要执行
+#这里的每次迭代成果都是和acq_data 做对比
+
+# 这个recon是之前的代码建设的
+# 创建一个 OSMAPOSL（Ordered-Subsets MAP One-Step-Late）重建器
+recon = OSMAPOSLReconstructor()
+
+# 挂上目标函数
+recon.set_objective_function(obj_fun)
+
+# 在这里就已经指定好子集数和子迭代数了
+# recon.set_num_subsets(num_subsets)          # 比如 21
+# recon.set_num_subiterations(num_subiterations)  # 比如 12
+
+recon.process()          #开始重建
+image_array = recon.get_output().as_array()                  # 输出结果
+show_2D_array('Reconstructed image', image_array[z,:,:])     # 查看其中一个切片
+
+
+```
+
+
+
+
+
+ 
+
+
